@@ -18,71 +18,88 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const ProtectedRoute = ({ children, adminOnly = false }: { children: JSX.Element, adminOnly?: boolean }) => {
+// ProtectedRoute component should be defined after AuthProvider is available
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <CartProvider>
+              <Toaster />
+              <Sonner />
+              <AppRoutes />
+            </CartProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
+
+// Separate component for routes that uses the auth context after the providers are set up
+const AppRoutes = () => {
   const { isAuthenticated, user, isLoading } = useAuth();
   
   if (isLoading) {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
   
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
-  }
+  // ProtectedRoute component defined inside AppRoutes to ensure useAuth works
+  const ProtectedRoute = ({ 
+    children, 
+    adminOnly = false 
+  }: { 
+    children: JSX.Element, 
+    adminOnly?: boolean 
+  }) => {
+    if (!isAuthenticated) {
+      return <Navigate to="/login" />;
+    }
+    
+    if (adminOnly && user?.role !== 'admin') {
+      return <Navigate to="/" />;
+    }
+    
+    return children;
+  };
   
-  if (adminOnly && user?.role !== 'admin') {
-    return <Navigate to="/" />;
-  }
-  
-  return children;
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/" element={
+        <ProtectedRoute>
+          <HomePage />
+        </ProtectedRoute>
+      } />
+      <Route path="/restaurant/:id" element={
+        <ProtectedRoute>
+          <RestaurantPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/profile" element={
+        <ProtectedRoute>
+          <ProfilePage />
+        </ProtectedRoute>
+      } />
+      <Route path="/cart" element={
+        <ProtectedRoute>
+          <CartPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/checkout" element={
+        <ProtectedRoute>
+          <CheckoutPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin" element={
+        <ProtectedRoute adminOnly={true}>
+          <AdminDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
 };
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <CartProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <HomePage />
-                </ProtectedRoute>
-              } />
-              <Route path="/restaurant/:id" element={
-                <ProtectedRoute>
-                  <RestaurantPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/profile" element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              } />
-              <Route path="/cart" element={
-                <ProtectedRoute>
-                  <CartPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/checkout" element={
-                <ProtectedRoute>
-                  <CheckoutPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin" element={
-                <ProtectedRoute adminOnly={true}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </CartProvider>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
 
 export default App;
