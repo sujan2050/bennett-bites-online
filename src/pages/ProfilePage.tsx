@@ -2,7 +2,7 @@
 import { useState } from "react";
 import MainLayout from "../components/Layout/MainLayout";
 import { useAuth } from "../context/AuthContext";
-import { orders } from "../data/mockData";
+import { orders, restaurants } from "../data/mockData";
 import { Address } from "../types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
