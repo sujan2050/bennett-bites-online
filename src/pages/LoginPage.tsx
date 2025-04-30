@@ -19,13 +19,26 @@ const LoginPage = () => {
     return null;
   }
 
-  const handleLogin = async (e: FormEvent) => {
+  const handleCustomerLogin = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const success = await login(email, password);
+      const success = await login(email, password, false);
       if (success) {
         navigate('/');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  const handleAdminLogin = async (e: FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const success = await login(email, password, true);
+      if (success) {
+        navigate('/admin');
       }
     } finally {
       setIsSubmitting(false);
@@ -42,21 +55,22 @@ const LoginPage = () => {
           <p className="text-gray-600 mt-2">Campus food delivery made easy</p>
         </div>
         
-        <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="login">Login</TabsTrigger>
+        <Tabs defaultValue="customer" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsTrigger value="customer">Customer Login</TabsTrigger>
+            <TabsTrigger value="admin">Admin Login</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="login">
+          <TabsContent value="customer">
             <Card>
               <CardHeader>
-                <CardTitle>Login to your account</CardTitle>
+                <CardTitle>Customer Login</CardTitle>
                 <CardDescription>
-                  Enter your credentials to access Bennett Foods
+                  Login to order food from Bennett Foods
                 </CardDescription>
               </CardHeader>
-              <form onSubmit={handleLogin}>
+              <form onSubmit={handleCustomerLogin}>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <label htmlFor="email" className="text-sm font-medium text-gray-700">
@@ -98,7 +112,61 @@ const LoginPage = () => {
                     className="w-full bennett-button" 
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? "Logging in..." : "Login"}
+                    {isSubmitting ? "Logging in..." : "Login as Customer"}
+                  </Button>
+                </CardFooter>
+              </form>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="admin">
+            <Card>
+              <CardHeader>
+                <CardTitle>Admin Login</CardTitle>
+                <CardDescription>
+                  Login to manage Bennett Foods platform
+                </CardDescription>
+              </CardHeader>
+              <form onSubmit={handleAdminLogin}>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <label htmlFor="adminEmail" className="text-sm font-medium text-gray-700">
+                      Email
+                    </label>
+                    <Input
+                      id="adminEmail"
+                      type="email"
+                      placeholder="admin@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="bennett-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label htmlFor="adminPassword" className="text-sm font-medium text-gray-700">
+                        Password
+                      </label>
+                    </div>
+                    <Input
+                      id="adminPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="bennett-input"
+                    />
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    type="submit" 
+                    className="w-full bennett-button bg-bennettBlue" 
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Logging in..." : "Login as Admin"}
                   </Button>
                 </CardFooter>
               </form>

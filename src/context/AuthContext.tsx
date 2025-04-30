@@ -7,7 +7,7 @@ import { toast } from '@/hooks/use-toast';
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string, isAdmin: boolean) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, isAdmin: boolean) => {
     setIsLoading(true);
     
     // Simulate API call
@@ -47,12 +47,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setIsLoading(false);
           resolve(true);
         } else {
-          // For any other email, create a new user with customer role
+          // Create a new user with appropriate role
           const newUser: User = {
             id: `user_${Date.now()}`,
             email: email,
             name: email.split('@')[0], // Use part of email as name
-            role: 'customer',
+            role: isAdmin ? 'admin' : 'customer',
             phoneNumber: '',
             addresses: []
           };
