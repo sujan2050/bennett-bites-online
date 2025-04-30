@@ -33,9 +33,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Simulate API call
     return new Promise<boolean>((resolve) => {
       setTimeout(() => {
+        // First check if the user exists in our mock data
         const foundUser = users.find(u => u.email === email);
         
-        if (foundUser && password === 'password') { // Simple password check for demo
+        if (foundUser) {
+          // If user exists in mock data, log them in
           setUser(foundUser);
           localStorage.setItem('bennettUser', JSON.stringify(foundUser));
           toast({
@@ -45,13 +47,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setIsLoading(false);
           resolve(true);
         } else {
+          // For any other email, create a new user with customer role
+          const newUser: User = {
+            id: `user_${Date.now()}`,
+            email: email,
+            name: email.split('@')[0], // Use part of email as name
+            role: 'customer',
+            phoneNumber: '',
+            addresses: []
+          };
+          
+          setUser(newUser);
+          localStorage.setItem('bennettUser', JSON.stringify(newUser));
           toast({
-            title: "Login Failed",
-            description: "Invalid email or password",
-            variant: "destructive",
+            title: "Login Successful",
+            description: `Welcome, ${newUser.name}!`,
           });
           setIsLoading(false);
-          resolve(false);
+          resolve(true);
         }
       }, 1000);
     });

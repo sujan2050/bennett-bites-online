@@ -103,11 +103,6 @@ const LoginPage = () => {
                 </CardFooter>
               </form>
             </Card>
-            <div className="mt-4 text-center text-sm text-gray-600">
-              <p>Demo credentials:</p>
-              <p>Customer: customer@example.com / password</p>
-              <p>Admin: admin@example.com / password</p>
-            </div>
           </TabsContent>
           
           <TabsContent value="signup">
